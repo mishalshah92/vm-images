@@ -9,7 +9,7 @@
           "volume_type": "gp2"
         }
       ],
-      "ami_description": "App AMI",
+      "ami_description": "Ops AMI",
       "ami_name": "{{user `dest_ami_name`}}",
       "ami_regions": "{{user `ami_regions`}}",
       "ami_users": "{{user `ami_accounts`}}",
@@ -32,10 +32,14 @@
           "Repo": "{{user `repo`}}",
           "Tool": "{{user `tool`}}",
           "ResourceGroup": "{{user `resource_group`}}",
-          "Commit": "{{user `git_sha`}}",
           "Base_ami_name": "{{ .SourceAMIName }}"
         }
       ],
+      "security_group_filter": {
+        "filters": {
+          "tag:Name": "vpn"
+        }
+      },
       "source_ami_filter": {
         "filters": {
           "name": "{{user `source_ami_name` }}",
@@ -66,7 +70,6 @@
           "Repo": "{{user `repo`}}",
           "Tool": "{{user `tool`}}",
           "ResourceGroup": "{{user `resource_group`}}",
-          "Commit": "{{user `git_sha`}}",
           "Base_ami_name": "{{ .SourceAMIName }}"
         }
       ],
@@ -108,14 +111,16 @@
     },
     {
       "inline": [
+        "helm plugin install https://github.com/chartmuseum/helm-push.git",
+        "sudo apt-get autoremove",
+        "sudo apt-get clean",
         "sudo apt autoremove -y"
       ],
       "type": "shell"
     }
   ],
   "variables": {
-    "name": "no_service",
-    "region": "no_region",
+    "name": "no_name",
     "vm_size": "no_vm_size",
     "source_ami_name": "no_source_ami_name",
     "source_image_owner": "no_owner",
@@ -123,6 +128,7 @@
     "resource_group": "no_rg",
     "ami_regions": "no_regions",
     "dest_ami_name": "no-ami",
+    "git_sha": "no-git-sha",
     "tool": "Managed by Packer",
     "repo": "no_repo",
     "customer": "no_customer",
@@ -130,3 +136,4 @@
     "email": "no_email"
   }
 }
+

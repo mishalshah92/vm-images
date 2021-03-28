@@ -35,17 +35,11 @@ $ make [Target]
    
    Terraform version: `>= 0.14`
 
-### Configurations
-
-#### Tools & Libraries Installation:
-
-
-
 ### How to find AMIs
 
 #### By tag
 ```
-"Name": "app-image-2019-11-08T09-55-47Z-d12c461"
+"Name": "app-image-2019-11-08T09-55-47Z-d12c461" OR "ops-image-2019-11-08T09-55-47Z-d12c461" 
 ```
 
 ## Overview

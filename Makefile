@@ -25,7 +25,7 @@ EMAIL:=mishalshah1992@gmail.com
 REPO:=https://github.com/mishah92/aws-ec2-images.git
 
 validate:
-	packer validate src/worker_template.json
+	packer validate src/$(IMAGE)/worker_template.json
 
 build: validate
 	packer build \
@@ -41,7 +41,7 @@ build: validate
 		-var "repo=$(REPO)" \
 		-var "customer=$(CUSTOMER)" \
 		-var "owner=$(OWNER)" \
-		-var "email=$(EMAIL)"  src/worker_template.json
+		-var "email=$(EMAIL)"  src/$(IMAGE)/worker_template.json
 
 test:
 	sh ./test.sh $(REGION) $(CUSTOMER) $(ENV) $(OWNER) $(EMAIl) $(REPO) $(IMAGE)
