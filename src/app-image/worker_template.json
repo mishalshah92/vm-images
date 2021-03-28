@@ -1,0 +1,132 @@
+{
+  "builders": [
+    {
+      "ami_block_device_mappings": [
+        {
+          "delete_on_termination": "true",
+          "device_name": "/dev/sda1",
+          "volume_size": 30,
+          "volume_type": "gp2"
+        }
+      ],
+      "ami_description": "App AMI",
+      "ami_name": "{{user `dest_ami_name`}}",
+      "ami_regions": "{{user `ami_regions`}}",
+      "ami_users": "{{user `ami_accounts`}}",
+      "instance_type":  "{{user `vm_size`}}",
+      "launch_block_device_mappings": [
+        {
+          "delete_on_termination": "true",
+          "device_name": "/dev/sda1",
+          "volume_size": 30,
+          "volume_type": "gp2"
+        }
+      ],
+      "region": "{{user `region`}}",
+      "run_tags": [
+        {
+          "Name": "{{user `name`}}",
+          "Customer": "{{user `customer`}}",
+          "Email": "{{user `email`}}",
+          "Owner": "{{user `owner`}}",
+          "Repo": "{{user `repo`}}",
+          "Tool": "{{user `tool`}}",
+          "ResourceGroup": "{{user `resource_group`}}",
+          "Commit": "{{user `git_sha`}}",
+          "Base_ami_name": "{{ .SourceAMIName }}"
+        }
+      ],
+      "source_ami_filter": {
+        "filters": {
+          "name": "{{user `source_ami_name` }}",
+          "root-device-type": "ebs",
+          "virtualization-type": "hvm"
+        },
+        "most_recent": true,
+        "owners": [
+          "{{user `source_image_owner`}}"
+        ]
+      },
+      "ssh_pty": true,
+      "ssh_timeout": "10m",
+      "ssh_username": "ubuntu",
+      "subnet_filter": {
+        "filters": {
+          "tag:Name": "samya-dev-vpc-app-subnet*"
+        },
+        "most_free": true,
+        "random": true
+      },
+      "tags": [
+        {
+          "Name": "{{user `name`}}",
+          "Customer": "{{user `customer`}}",
+          "Email": "{{user `email`}}",
+          "Owner": "{{user `owner`}}",
+          "Repo": "{{user `repo`}}",
+          "Tool": "{{user `tool`}}",
+          "ResourceGroup": "{{user `resource_group`}}",
+          "Commit": "{{user `git_sha`}}",
+          "Base_ami_name": "{{ .SourceAMIName }}"
+        }
+      ],
+      "type": "amazon-ebs"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "src/configs/ssh_banner",
+      "destination": "ssh_banner"
+    },
+    {
+      "type": "file",
+      "source": "src/configs/ssh_config",
+      "destination": "ssh_config"
+    },
+    {
+      "type": "file",
+      "source": "src/configs/sshd_config",
+      "destination": "sshd_config"
+    },
+    {
+      "inline": [
+        "sudo mv ssh_banner /etc/ssh/ssh_banner",
+        "sudo mv ssh_config /etc/ssh/ssh_config",
+        "sudo mv sshd_config /etc/ssh/sshd_config",
+        "sudo apt-get update",
+        "sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -yq",
+        "sudo apt-get install software-properties-common -y",
+        "sudo apt-add-repository --yes --update ppa:ansible/ansible",
+        "sudo apt install ansible -y"
+      ],
+      "type": "shell"
+    },
+    {
+      "playbook_file": "src/ansible-playbook.yml",
+      "type": "ansible-local"
+    },
+    {
+      "inline": [
+        "sudo apt autoremove -y"
+      ],
+      "type": "shell"
+    }
+  ],
+  "variables": {
+    "name": "no_service",
+    "region": "no_region",
+    "vm_size": "no_vm_size",
+    "source_ami_name": "no_source_ami_name",
+    "source_image_owner": "no_owner",
+    "ami_accounts": "no-accounts",
+    "resource_group": "no_rg",
+    "ami_regions": "no_regions",
+    "dest_ami_name": "no-ami",
+    "tool": "Managed by Packer",
+    "repo": "no_repo",
+    "customer": "no_customer",
+    "owner": "no_owner",
+    "email": "no_email"
+  }
+}

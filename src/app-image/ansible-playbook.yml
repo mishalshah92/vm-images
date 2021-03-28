@@ -1,0 +1,135 @@
+---
+
+- name: run the playbook tasks on the localhost
+  hosts: 127.0.0.1
+  connection: local
+  become: yes
+
+  tasks:
+    - name: Install aptitude using apt
+      apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+
+    - name: Upgrade all apt packages
+      apt: upgrade=dist force_apt_get=yes
+
+    - name: Install required system packages
+      apt: name={{ item }} state=latest update_cache=yes
+      loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools', 'nfs-common', 'wget','bzip2','unzip', 'git', 'build-essential', 'libssl-dev']
+
+    - name: Download AWSCLI v2
+      get_url:
+        url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+        dest: /tmp/awscli2.zip
+
+    - name: Creates AWS CLI directory
+      file:
+        path: /tmp/awscli2
+        state: directory
+
+    - name: Unzip AWSCLI v2
+      unarchive:
+        src: /tmp/awscli2.zip
+        dest: /tmp/awscli2/
+
+    - name: Install AWSCLI v2
+      command: sh /tmp/awscli2/aws/install
+
+    - name: Download Influxdb apt key.
+      apt_key:
+        url: "https://repos.influxdata.com/influxdb.key"
+        state: present
+      become: yes
+      tags:
+        - telegraf
+        - packages
+
+    - name: Add Influxdb repository (using LSB).
+      apt_repository:
+        repo: "deb https://repos.influxdata.com/{{ ansible_distribution|lower }} {{ ansible_lsb.codename }} stable"
+        filename: "influxdb"
+        state: present
+      tags:
+        - telegraf
+        - packages
+      when: ansible_lsb is defined
+
+    - name: Add Influxdb repository.
+      apt_repository:
+        repo: "deb https://repos.influxdata.com/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} stable"
+        filename: "influxdb"
+        state: present
+      become: yes
+      tags:
+        - telegraf
+        - packages
+      when: ansible_lsb is not defined
+
+    - name: Install telegraf package | Debian
+      action: apt
+        name=telegraf
+        state=latest
+        update_cache=yes
+
+    - name: Start telegraf service, if not started
+      service:
+        name: telegraf
+        state: started
+        enabled: yes
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      apt: update_cache=yes name=docker-ce state=latest
+
+    - name: Start docker service, if not started
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: add ubuntu user to docker group
+      user:
+        name: 'ubuntu'
+        groups: docker
+        append: yes
+
+    - name: install pipenv
+      command: pip3 install pipenv
+
+    - name: install docker-compose
+      command: pip3 install docker-compose
+
+    - name: checkout git-crypt repo
+      git:
+        repo: 'https://github.com/AGWA/git-crypt.git'
+        dest: /home/ubuntu/git-crypt
+        depth: 1
+        version: "0.6.0"
+
+    - name: build git-crypt
+      command: chdir=/home/ubuntu/git-crypt make
+
+    - name: install git-crypt
+      command: chdir=/home/ubuntu/git-crypt make install
+
+    - name: checkout aws/efs-utils repo
+      git:
+        repo: 'https://github.com/aws/efs-utils.git'
+        dest: /home/ubuntu/efs-utils
+        depth: 1
+        version: "v1.13"
+
+    - name: build efs-utils
+      command: chdir=/home/ubuntu/efs-utils ./build-deb.sh
+
+    - name: install efs-utils
+      apt:
+        deb: /home/ubuntu/efs-utils/build/amazon-efs-utils-1.13-1.deb
