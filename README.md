@@ -44,7 +44,7 @@ $ make [Target]
 
 ## Overview
 
-- **Maintainer**: mishalshah1992@gmail.com
+- **Maintainer**: mishalshah92@gmail.com
 
 ## Releases
 
