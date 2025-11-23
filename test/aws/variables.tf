@@ -22,6 +22,11 @@ variable "image" {
   type = string
 }
 
+variable "test_script" {
+  type    = string
+  default = "app_test.sh"
+}
+
 # tags
 variable "customer" {
   type = string

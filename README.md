@@ -1,4 +1,4 @@
-# AWS EC2 Images
+# VM Images
 
 Using Packer this is building AWS EC2 machine images (AMI) with Ansible pre-installing packages.
 
@@ -6,8 +6,8 @@ Base AMI: `Ubuntu 18.04 LTS`
 
 ### Images
 
-- [app-image](src/app-image)
-- [ops-image](src/ops-image)
+- [app-image](images/aws/app-image)
+- [ops-image](images/aws/ops-image)
 
 ### Developing
 
@@ -42,9 +42,9 @@ $ make [Target]
 "Name": "app-image-2019-11-08T09-55-47Z-d12c461" OR "ops-image-2019-11-08T09-55-47Z-d12c461" 
 ```
 
-## Overview
+## Maintainer
 
-- **Maintainer**: mishalshah92@gmail.com
+Mishal Shah -- _mishalshah92@gmail.com_
 
 ## Releases
 

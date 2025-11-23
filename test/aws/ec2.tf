@@ -1,7 +1,7 @@
 resource "aws_instance" "worker-docker-instance" {
 
-  ami           = data.aws_ami.default.id
-  instance_type = var.set_instance_type
+  ami                                  = data.aws_ami.default.id
+  instance_type                        = var.set_instance_type
   instance_initiated_shutdown_behavior = var.set_instance_initiated_shutdown_behavior
 
   subnet_id = element(tolist(data.aws_subnet_ids.default.ids), 0)
@@ -24,11 +24,11 @@ resource "aws_instance" "worker-docker-instance" {
   }
 
   volume_tags = local.tags
-  tags = local.tags
+  tags        = local.tags
 
   provisioner "remote-exec" {
 
-    script = "${path.module}/app_test.sh"
+    script = "${path.module}/res/${var.test_script}"
 
     connection {
       type        = "ssh"

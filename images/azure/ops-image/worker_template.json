@@ -1,0 +1,93 @@
+{
+  "builders": [
+    {
+      "type": "azure-arm",
+      "use_azure_cli_auth": "true",
+      "managed_image_resource_group_name": "{{user `resource_group`}}",
+      "managed_image_name": "{{user `image_name`}}",
+      "managed_image_storage_account_type": "Standard_LRS",
+      "os_type": "{{user `os_type`}}",
+      "image_publisher": "{{user `image_publisher`}}",
+      "image_offer": "{{user `image_offer`}}",
+      "image_sku": "{{user `image_sku`}}",
+      "azure_tags": {
+        "Customer": "{{user `customer`}}",
+        "Email": "{{user `email`}}",
+        "Owner": "{{user `owner`}}",
+        "Repo": "{{user `repo`}}",
+        "Commit": "{{user `git_sha`}}",
+        "Tool": "{{user `tool`}}",
+        "Location": "{{user `location`}}",
+        "ResourceGroup": "{{user `resource_group`}}",
+        "SourceImage": "{{user `image_publisher`}}/{{user `image_offer`}}/{{user `image_sku`}}"
+      },
+      "location": "{{user `location`}}",
+      "vm_size": "{{user `vm_size`}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "src/waagent.conf",
+      "destination": "waagent.conf"
+    },
+    {
+      "type": "file",
+      "source": "src/ssh_banner",
+      "destination": "ssh_banner"
+    },
+    {
+      "type": "file",
+      "source": "src/ssh_config",
+      "destination": "ssh_config"
+    },
+    {
+      "type": "file",
+      "source": "src/sshd_config",
+      "destination": "sshd_config"
+    },
+    {
+      "inline": [
+        "sudo mv waagent.conf /etc/waagent.conf",
+        "sudo mv ssh_banner /etc/ssh/ssh_banner",
+        "sudo mv ssh_config /etc/ssh/ssh_config",
+        "sudo mv sshd_config /etc/ssh/sshd_config",
+        "sudo apt-get update",
+        "sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -yq",
+        "sudo apt-get install software-properties-common -y",
+        "sudo apt-add-repository --yes --update ppa:ansible/ansible",
+        "sudo apt install ansible -y",
+        "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"
+      ],
+      "type": "shell"
+    },
+    {
+      "playbook_file": "src/ansible-playbook.yml",
+      "type": "ansible-local"
+    },
+    {
+      "inline": [
+        "sudo apt autoremove -y"
+      ],
+      "type": "shell"
+    }
+  ],
+  "variables": {
+    "customer": "customer",
+    "owner": "Mishal Shah",
+    "email": "mishalshah1992@gmail.com",
+    "git_sha": "no-git-sha",
+    "repo": "https://github.com/cloudops92/azure-vm-images",
+    "tool": "Managed by Packer",
+    "resource_group": "no_rg",
+    "subscription_id": "no_subscription_id",
+    "location": "centralindia",
+    "vm_size": "Standard_DS2_v2",
+    "os_type": "Linux",
+    "image_name": "ddai-app-image",
+    "image_publisher": "Canonical",
+    "image_offer": "UbuntuServer",
+    "image_sku": "18.04-LTS"
+  }
+}
+
