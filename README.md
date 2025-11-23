@@ -22,6 +22,7 @@ Base Image: `Ubuntu 18.04 LTS`
 
 **AWS**
 - [app-image](images/aws/app-image)
+- [k8s-master](images/aws/k8s-master)
 - [ops-image](images/aws/ops-image)
 
 **Azure**

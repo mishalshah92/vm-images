@@ -2,7 +2,7 @@
 
 set -e
 
-MODULE_PATH="$( cd "$(dirname "$0")" ; pwd -P )/test/azure/"
+MODULE_PATH="$( cd "$(dirname "$0")" ; pwd -P )/test/aws/$IMAGE/"
 REGION=$1
 CUSTOMER=$2
 ENV=$3

@@ -1,0 +1,100 @@
+{
+
+  "variables":   {
+    "name": "no_service",
+    "region": "no_region",
+    "vm_size": "no_vm_size",
+    "source_ami_name": "no_source_ami_name",
+    "source_image_owner": "no_owner",
+    "ami_accounts": "no-accounts",
+    "resource_group": "no_rg",
+    "ami_regions": "no_regions",
+    "dest_ami_name": "no-ami",
+    "tool": "Managed by Packer",
+    "repo": "no_repo",
+    "customer": "no_customer",
+    "owner": "no_owner",
+    "email": "no_email"
+  },
+
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "ami_name": "{{user `dest_ami_name`  | clean_resource_name}}",
+      "ami_description": "Kubernetes Master AMI",
+      "ami_regions": "{{user `regions`}}",
+      "ami_users": "{{user `grpn_accounts`}}",
+      "instance_type": "t2.micro",
+      "region": "us-west-2",
+      "run_tags": [
+        [
+          {
+            "Name": "{{user `name`}}",
+            "Customer": "{{user `customer`}}",
+            "Email": "{{user `email`}}",
+            "Owner": "{{user `owner`}}",
+            "Repo": "{{user `repo`}}",
+            "Tool": "{{user `tool`}}",
+            "ResourceGroup": "{{user `resource_group`}}",
+            "Commit": "{{user `git_sha`}}",
+            "Base_ami_name": "{{ .SourceAMIName }}"
+          }
+        ]
+      ],
+      "security_group_filter": {
+        "filters": {
+          "group-name": "default"
+        }
+      },
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server*",
+          "root-device-type": "ebs"
+        },
+        "owners": ["099720109477"],
+        "most_recent": true
+      },
+      "ssh_pty": true,
+      "ssh_timeout": "10m",
+      "ssh_username": "ubuntu",
+      "tags": [
+        {
+          "Name": "{{user `name`}}",
+          "Customer": "{{user `customer`}}",
+          "Email": "{{user `email`}}",
+          "Owner": "{{user `owner`}}",
+          "Repo": "{{user `repo`}}",
+          "Tool": "{{user `tool`}}",
+          "ResourceGroup": "{{user `resource_group`}}",
+          "Commit": "{{user `git_sha`}}",
+          "Base_ami_name": "{{ .SourceAMIName }}"
+        }
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "inline": [
+        "sudo apt-get update",
+        "sudo apt-get install python3.6 -y",
+        "sudo apt install software-properties-common -y",
+        "sudo apt-add-repository --yes --update ppa:ansible/ansible",
+        "sudo apt install ansible -y"
+      ],
+      "type": "shell"
+    },
+    {
+      "playbook_file": "config/kubernetes-install.yml",
+      "type": "ansible-local"
+    },
+    {
+      "inline": [
+        "sudo apt-get autoremove",
+        "sudo apt-get clean"
+      ],
+      "type": "shell"
+    }
+  ]
+}
+

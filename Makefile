@@ -4,6 +4,7 @@ TAG:=$(DATE)-$(REV)
 
 .PHONY: validate-aws validate-azure build-aws build-azure test-aws test-azure clean
 
+CLOUD:=aws
 IMAGE:=app-image
 
 ## AWS_Config
@@ -39,14 +40,11 @@ OWNER:=Mishal Shah
 EMAIL:=mishalshah92@gmail.com
 REPO:=https://github.com/mishalshah92/vm-images.git
 
-validate-aws:
-	packer validate images/aws/$(IMAGE)/worker_template.json
-
-validate-azure:
-	packer validate images/azure/$(IMAGE)/worker_template.json
+validate:
+	packer validate images/$(CLOUD)/$(IMAGE)/packer.json
 
 
-build-aws: validate-aws
+build-aws: validate
 	packer build \
 		-var "name=$(IMAGE_NAME)" \
 		-var "region=$(AWS_REGION)" \
@@ -60,9 +58,9 @@ build-aws: validate-aws
 		-var "repo=$(REPO)" \
 		-var "customer=$(CUSTOMER)" \
 		-var "owner=$(OWNER)" \
-		-var "email=$(EMAIL)"  images/aws/$(IMAGE)/worker_template.json
+		-var "email=$(EMAIL)"  images/aws/$(IMAGE)/packer.json
 
-build-azure: validate-azure
+build-azure: validate
 	packer build \
 		-var "vm_size=$(Azure_VM_SIZE)" \
 		-var "os_type=$(Azure_OS_TYPE)" \
@@ -77,7 +75,7 @@ build-azure: validate-azure
 		-var "customer=$(CUSTOMER)" \
 		-var "repo=$(REPO)" \
 		-var "owner=$(OWNER)" \
-		-var "email=$(EMAIL)"  images/azure/$(IMAGE)/worker_template.json
+		-var "email=$(EMAIL)"  images/azure/$(IMAGE)/packer.json
 
 test-azure:
 	sh .test/test-azure.sh $(LOCATION) $(CUSTOMER) $(ENV) $(OWNER) $(EMAIl) $(REPO) $(IMAGE_NAME) $(IMAGE) $(RESOURCE_GROUP) $(AZURE_TEST_SCRIPT)
