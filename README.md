@@ -18,7 +18,7 @@ Packer and Ansible.
 
 Base AMI: `Ubuntu 18.04 LTS`
 
-### Images
+## Images
 
 **AWS**
 - [app-image](images/aws/app-image)
@@ -33,11 +33,11 @@ Base AMI: `Ubuntu 18.04 LTS`
 - We use the [Packer](https://packer.io/) to build the VM Images.
 - We use [Ansible](https://www.ansible.com/) to install and configure base tools and libraries.
 
-```
+```shell
 $ make [Target]
 ```
 
-### **Targets**
+#### **Make Targets**
 
 - `$ make validate-aws / make validate-azure`
 
@@ -54,7 +54,7 @@ $ make [Target]
    
 Terraform version: `>= 0.14`
 
-### How to find Images?
+## How to find Images?
 
 #### For AWS - By tag
 ```
