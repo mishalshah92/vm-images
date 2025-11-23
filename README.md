@@ -16,7 +16,7 @@ Packer and Ansible.
 - Tagging and naming standards: Generated images follow structured naming (e.g., app-image-YYYY-MM-DDT…).
 - Modular & extensible: Add new image definitions, build scripts, or cloud providers as needed.
 
-Base AMI: `Ubuntu 18.04 LTS`
+Base Image: `Ubuntu 18.04 LTS`
 
 ## Images
 
