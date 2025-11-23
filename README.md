@@ -28,7 +28,7 @@ Base AMI: `Ubuntu 18.04 LTS`
 - [app-image](images/azure/app-image)
 - [ops-image](images/azure/ops-image)
 
-### Developing
+## Developing
 
 - We use the [Packer](https://packer.io/) to build the VM Images.
 - We use [Ansible](https://www.ansible.com/) to install and configure base tools and libraries.
